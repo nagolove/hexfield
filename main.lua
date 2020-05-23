@@ -93,11 +93,7 @@ end
 
 love.draw = function()
     gr.setColor{0, 0.85, 0.1, 0.5}
-
-    --local w, h = gr.getDimensions()
-    --gr.setScissor(0, 0, w / 2, h / 2)
     drawHexField(hexField)
-
     gr.setColor{1, 1, 1, 1}
     gr.print(string.format("FPS %d", love.timer.getFPS()))
 end
