@@ -1,3 +1,4 @@
+require "snippets"
 local inspect = require "inspect"
 local gr = love.graphics
 
@@ -17,6 +18,9 @@ function genHexPolygon(cx, cy, rad)
         c = c + d
     end
 
+    hex.selected = false
+    hex.cx, hex.cy = cx, cy
+
     return hex
 end
 
@@ -28,7 +32,7 @@ function getHexPolygonHeight(hex)
     return dist(hex[1], hex[2], hex[7], hex[8])
 end
 
-function genHexField2(startcx, startcy, xcount, ycount, rad)
+function genHexField(startcx, startcy, xcount, ycount, rad)
     local result = {}
     local cx, cy = startcx, startcy
     local hasWH = false
@@ -48,55 +52,31 @@ function genHexField2(startcx, startcy, xcount, ycount, rad)
     return result
 end
 
-function genHexField(startcx, startcy, xcount, ycount, rad)
-    local result = {}
-    local cx, cy = startcx, startcy
-    local hasWH = false
-    local w, h
-    for i = 1, xcount do
-        for j = 1, ycount do
-            table.insert(result, genHexPolygon(cx, cy, rad))
-            if not hasWH then
-                w, h = getHexPolygonWidth(result[#result]), 
-                    getHexPolygonHeight(result[#result])
-            end
-            cy = cy + h
-        end
-        cx = cx + w
-    end
-    return result
-end
-
 local hex = genHexPolygon(100, 100, 50)
-local hexField = genHexField2(80, 80, 20, 20, 50)
+local hexRad = 50
+local hexField = genHexField(80, 80, 200, 200, hexRad)
 local hexHeight = getHexPolygonHeight(hex)
 local hexWidth = getHexPolygonWidth(hex)
-print("hex", inspect(hex))
 
 function drawHexField(field)
     local prevColor = {gr.getColor()}
     local alpha = prevColor[4]
+    local w, h = gr.getDimensions()
     for k, v in pairs(field) do
-        gr.setColor(prevColor)
-        gr.polygon("fill", v)
-        gr.setColor{0, 0, 0, alpha}
-        gr.polygon("line", v)
-    end
-end
-
-function drawField()
-    gr.push()
-    gr.setColor{0, 0.87, 0}
-    for i = 1, 20 do
-        for j = 1, 20 do
-            gr.translate(i * 30, j * 30)
-            gr.polygon("fill", hex)
+        if v.cx + hexRad < w or v.cy + hexRad < h then
+            if v.selected then
+                gr.setColor{1, 0, 0, alpha}
+            else
+                gr.setColor(prevColor)
+            end
+            gr.polygon("fill", v)
+            gr.setColor{0, 0, 0, alpha}
+            gr.polygon("line", v)
         end
     end
-    gr.pop()
 end
 
-love.draw = function()
+function testHexDrawing()
     gr.setColor{0, 0.87, 0}
     gr.polygon("fill", hex)
 
@@ -109,9 +89,31 @@ love.draw = function()
     gr.setColor{0, 0, 1}
     gr.line(hex[1], hex[2], hex[1], hex[2] - hexHeight)
     gr.line(hex[3], hex[4], hex[3] - hexWidth, hex[4])
+end
 
+love.draw = function()
     gr.setColor{0, 0.85, 0.1, 0.5}
+
+    --local w, h = gr.getDimensions()
+    --gr.setScissor(0, 0, w / 2, h / 2)
     drawHexField(hexField)
+
+    gr.setColor{1, 1, 1, 1}
+    gr.print(string.format("FPS %d", love.timer.getFPS()))
+end
+
+function updateSelectedItem(x, y)
+    for k, v in pairs(hexField) do
+        if pointInPolygon(v, x, y) then
+            v.selected = true
+        else
+            v.selected = false
+        end
+    end
+end
+
+love.mousemoved = function(x, y, dx, dy)
+    updateSelectedItem(x, y)
 end
 
 love.update = function(dt)
