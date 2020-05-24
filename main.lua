@@ -34,6 +34,7 @@ end
 
 function genHexField(startcx, startcy, xcount, ycount, rad)
     local result = {}
+    local mesh = gr.newMesh(7 * xcount * ycount, "fan", "dynamic")
     local cx, cy = startcx, startcy
     local hasWH = false
     local w, h
@@ -54,7 +55,7 @@ end
 
 local hex = genHexPolygon(100, 100, 50)
 local hexRad = 50
-local hexField = genHexField(80, 80, 200, 200, hexRad)
+local hexField = genHexField(80, 80, 20, 20, hexRad)
 local hexHeight = getHexPolygonHeight(hex)
 local hexWidth = getHexPolygonWidth(hex)
 
