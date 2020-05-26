@@ -6,23 +6,36 @@ function dist(x1, y1, x2, y2)
     return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5 
 end
 
-function genHexPolygon(cx, cy, rad)
-    local Hex = {}
-    Hex.__index = Hex
+local Hex = {}
+Hex.__index = Hex
 
-    function Hex:getVertices()
-        local vertices = {}
-        for i = 1, 6 do
-            table.insert(vertices, self[i])
-        end
-        return vertices
+function Hex:getVertices()
+    local vertices = {}
+    for i = 1, 6 do
+        table.insert(vertices, self[i])
     end
+    return vertices
+end
 
-    function Hex:setMesh(mesh, startindex)
-        self.mesh = mesh
-        self.startindex = startindex
+function Hex:setMesh(mesh, endindex)
+    self.mesh = mesh
+    self.endindex = endindex
+end
+
+function Hex:setVertexColor(index, color)
+    --local vertex = {self.mesh:getVertex(self.endindex - index + 1)}
+    local vertex = {self.mesh:getVertex(self.endindex - index + 0)}
+
+    self.mesh:setVertex(self.endindex - index + 0, vertex)
+end
+
+function Hex:setColor(color)
+    for i = 1, 6 do
+        self:setVertexColor(i, color)
     end
+end
 
+function newHexPolygon(cx, cy, rad)
     local hex = setmetatable({}, Hex)
 
     local d = math.pi * 2 / 6
@@ -48,14 +61,41 @@ function getHexPolygonHeight(hex)
     return dist(hex[1], hex[2], hex[7], hex[8])
 end
 
-function genHexField(startcx, startcy, xcount, ycount, rad)
+function newHexField(startcx, startcy, xcount, ycount, rad, color)
 
     function addVertex(array, x, y)
         table.insert(array, {
             x, y,
             0, 0, -- u v
-            0.5, 0.5, 1, 1
+            color[1], color[2], color[3], color[4]
         })
+        return #array
+    end
+
+    function addHex(data, hex)
+        addVertex(data, hex.cx, hex.cy)
+        addVertex(data, hex[1], hex[2])
+        addVertex(data, hex[3], hex[4])
+
+        addVertex(data, hex.cx, hex.cy)
+        addVertex(data, hex[3], hex[4])
+        addVertex(data, hex[5], hex[6])
+
+        addVertex(data, hex.cx, hex.cy)
+        addVertex(data, hex[5], hex[6])
+        addVertex(data, hex[7], hex[8])
+
+        addVertex(data, hex.cx, hex.cy)
+        addVertex(data, hex[7], hex[8])
+        addVertex(data, hex[9], hex[10])
+
+        addVertex(data, hex.cx, hex.cy)
+        addVertex(data, hex[9], hex[10])
+        addVertex(data, hex[11], hex[12])
+
+        addVertex(data, hex.cx, hex.cy)
+        addVertex(data, hex[11], hex[12])
+        return addVertex(data, hex[1], hex[2])
     end
 
     local result = {}
@@ -67,38 +107,15 @@ function genHexField(startcx, startcy, xcount, ycount, rad)
     local w, h
     for j = 1, ycount do
         for i = 1, xcount do
-            local last = genHexPolygon(cx, cy, rad)
+            local last = newHexPolygon(cx, cy, rad)
             table.insert(result, last)
             if not hasWH then
                 w, h = getHexPolygonWidth(result[#result]), 
                     getHexPolygonHeight(result[#result])
             end
 
-            local lastHex = last
-
-            addVertex(meshData, lastHex.cx, lastHex.cy)
-            addVertex(meshData, lastHex[1], lastHex[2])
-            addVertex(meshData, lastHex[3], lastHex[4])
-
-            addVertex(meshData, lastHex.cx, lastHex.cy)
-            addVertex(meshData, lastHex[3], lastHex[4])
-            addVertex(meshData, lastHex[5], lastHex[6])
-
-            addVertex(meshData, lastHex.cx, lastHex.cy)
-            addVertex(meshData, lastHex[5], lastHex[6])
-            addVertex(meshData, lastHex[7], lastHex[8])
-
-            addVertex(meshData, lastHex.cx, lastHex.cy)
-            addVertex(meshData, lastHex[7], lastHex[8])
-            addVertex(meshData, lastHex[9], lastHex[10])
-
-            addVertex(meshData, lastHex.cx, lastHex.cy)
-            addVertex(meshData, lastHex[9], lastHex[10])
-            addVertex(meshData, lastHex[11], lastHex[12])
-
-            addVertex(meshData, lastHex.cx, lastHex.cy)
-            addVertex(meshData, lastHex[11], lastHex[12])
-            addVertex(meshData, lastHex[1], lastHex[2])
+            local lastIndex = addHex(meshData, last)
+            last:setMesh(mesh, lastIndex)
 
             cx = cx + w
         end
@@ -111,9 +128,12 @@ function genHexField(startcx, startcy, xcount, ycount, rad)
     return result, mesh
 end
 
-local hex = genHexPolygon(100, 100, 50)
 local hexRad = 50
-local hexField, hexMesh = genHexField(80, 80, 200, 200, hexRad)
+local hexColor = {0.5, 0.6, 1, 1}
+local activeHexColor, passiveHexColor = {0.85, 0, 0, 1}, {0.5, 0.6, 0, 1}
+local hexField, hexMesh = newHexField(80, 80, 200, 200, hexRad, passiveHexColor)
+
+local hex = newHexPolygon(100, 100, 50)
 local hexHeight = getHexPolygonHeight(hex)
 local hexWidth = getHexPolygonWidth(hex)
 
@@ -123,13 +143,13 @@ function drawHexField(field)
     local w, h = gr.getDimensions()
     for k, v in pairs(field) do
         if v.cx + hexRad < w or v.cy + hexRad < h then
-            if v.selected then
-                gr.setColor{1, 0, 0, alpha}
-            else
-                gr.setColor(prevColor)
-            end
-            gr.polygon("fill", v)
-            gr.setColor{0, 0, 0, alpha}
+            --if v.selected then
+                --gr.setColor{1, 0, 0, alpha}
+            --else
+                --gr.setColor(prevColor)
+            --end
+            --gr.polygon("fill", v)
+            --gr.setColor{0, 0, 0, alpha}
             gr.polygon("line", v)
         end
     end
@@ -151,13 +171,18 @@ function testHexDrawing()
 end
 
 love.draw = function()
-    gr.setColor{0, 0.85, 0.1, 0.5}
-    --drawHexField(hexField)
-
     gr.setColor{1, 1, 1, 1}
+
+    gr.push()
+    gr.scale(0.05, 0.05)
+
     gr.draw(hexMesh)
+
+    gr.setColor{0, 0.85, 0.1, 0.5}
+    drawHexField(hexField)
+
+    gr.pop()
     
-    --gr.draw(testMesh)
     gr.setColor{1, 1, 1, 1}
     gr.print(string.format("FPS %d", love.timer.getFPS()))
 end
@@ -165,9 +190,9 @@ end
 function updateSelectedItem(x, y)
     for k, v in pairs(hexField) do
         if pointInPolygon(v, x, y) then
-            v.selected = true
+            --v:setColor(activeHexColor)
         else
-            v.selected = false
+            --v:setColor(passiveHexColor)
         end
     end
 end
