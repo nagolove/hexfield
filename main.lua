@@ -51,11 +51,12 @@ love.draw = function()
 
     gr.push()
     --gr.scale(0.05, 0.05)
+    --gr.rotate(0.3)
 
     gr.draw(hexMesh)
 
     gr.setColor{0, 0.85, 0.1, 0.5}
-    drawHexField(hexField)
+    --drawHexField(hexField)
 
     gr.pop()
     

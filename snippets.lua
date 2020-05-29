@@ -1,3 +1,23 @@
+local gr = love.graphics
+
+function write2Canvas(func)
+    local fname = "draft.png"
+    local image
+    pcall(function()
+        image = gr.newImage(fname)
+    end)
+    local canvas = gr.newCanvas()
+    gr.setCanvas(canvas)
+    if image then
+        gr.setColor{0, 0, 0}
+        gr.draw(image)
+    end
+    func()
+    gr.setCanvas()
+    local imgdata = canvas:newImageData()
+    imgdata:encode("png", fname)
+end
+
 function dist(x1, y1, x2, y2) 
     return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5 
 end
