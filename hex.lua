@@ -165,10 +165,10 @@ function newHexField(startcx, startcy, xcount, ycount, rad, color)
    ]]
 
         local delta = 3
-        local smaller, bigger = newHexPolygon(cx, cy, rad + delta), newHexPolygon(cx, cy, rad + delta)
-        addVertex2(array, smaller[1], smaller[2])
-        addVertex2(array, bigger[3], bigger[4])
-        addVertex2(array, smaller[3], smaller[4])
+        --local smaller, bigger = newHexPolygon(cx, cy, rad + delta), newHexPolygon(cx, cy, rad + delta)
+        --addVertex2(array, smaller[1], smaller[2])
+        --addVertex2(array, bigger[3], bigger[4])
+        --addVertex2(array, smaller[3], smaller[4])
     end
 
     local result = {}

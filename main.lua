@@ -62,6 +62,11 @@ love.draw = function()
     
     gr.setColor{1, 1, 1, 1}
     gr.print(string.format("FPS %d", love.timer.getFPS()))
+
+    local drawLine = require "linemesh".drawLine
+    local cx, cy = gr.getWidth() / 2, gr.getHeight() / 2
+    local mx, my = love.mouse.getPosition()
+    drawLine(cx, cy, mx, my)
 end
 
 function updateSelectedItem(x, y)
