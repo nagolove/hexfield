@@ -6,8 +6,8 @@ local gr = love.graphics
 local hexRad = 50
 local hexColor = {0.5, 0.6, 1, 1}
 local activeHexColor, passiveHexColor = {0.85, 0, 0, 1}, {0.5, 0.6, 0, 1}
---local hexField, hexMesh = newHexField(80, 80, 200, 200, hexRad, passiveHexColor)
-local hexField, hexMesh = newHexField(80, 80, 1, 1, hexRad, passiveHexColor)
+local hexField, hexMesh = newHexField(80, 80, 200, 200, hexRad, passiveHexColor)
+--local hexField, hexMesh = newHexField(80, 80, 1, 1, hexRad, passiveHexColor)
 
 local hex = newHexPolygon(100, 100, 50)
 local hexHeight = getHexPolygonHeight(hex)

@@ -1,5 +1,8 @@
 local gr = love.graphics
 
+function addLineVertices(array, x1, y1, x2, y2)
+end
+
 function write2Canvas(func)
     local fname = "draft.png"
     local image

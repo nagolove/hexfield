@@ -1,4 +1,5 @@
 ﻿local gr = love.graphics
+local vec = require "vector"
 
 local Hex = {}
 Hex.__index = Hex
@@ -95,7 +96,7 @@ function newHexField(startcx, startcy, xcount, ycount, rad, color)
     function addVertex2(array, x, y)
         table.insert(array, {
             --x + 500, y + 500,
-            x, y,
+            math.floor(x), math.floor(y),
             0, 0, -- u v
             1, 1, 1, 1,
         })
@@ -104,71 +105,41 @@ function newHexField(startcx, startcy, xcount, ycount, rad, color)
     -- добавляет линию из пары треугольников и шести вершин
     function addLine(array, x1, y1, x2, y2)
         local len = dist(x1, y1, x2, y2)
-        local dirx, diry = (x2 - x1) / len, (y2 - y1) / len
-        local width = 10
-        local p1x, p1y = x1 + dirx * width, y1 + -diry * width
-        local p2x, p2y = x1 + dirx * width, y1 + -diry * width
-        local p3x, p3y = x2 + -dirx * width, y2 + diry * width
-        local p4x, p4y = x2 + -dirx * width, y2 + diry * width
-        --local p1x, p1y = x1 + -dirx * width, y1 + diry * width
-        --local p2x, p2y = x1 + dirx * width, y1 + -diry * width
-        --local p3x, p3y = x2 + -dirx * width, y2 + diry * width
-        --local p4x, p4y = x2 + dirx * width, y2 + -diry * width
+        local dirx, diry = vec(x2 - x1) / len, vec(y2 - y1) / len
+        local dir1, dir2 = vec(x2 - x1, y2 - y1) / len, vec(x1 - x2, y1 - y2) / len
 
-        --print(p1x, p1x)
-        --print(p2x, p2y)
-        
-        write2Canvas(function()
-            gr.setColor{1, 0, 1}
-            gr.line(x1, y1, x2, y2)
-            local y = 0
-            gr.print(string.format("len %f", len), 0, y)
-            y = y + gr.getFont():getHeight()
-            gr.print(string.format("dirx %f, diry %f", dirx, diry), 0, y)
-            y = y + gr.getFont():getHeight()
+        local width = 3
+        local p1 = vec(x1, y1) + dir1:perpendicular() * width
+        local p2 = vec(x1, y1) + dir2:perpendicular() * width
+        local p3 = vec(x2, y2) + dir1:perpendicular() * width
+        local p4 = vec(x2, y2) + dir2:perpendicular() * width
 
-            gr.setColor{0, 0, 0}
-            gr.points(100, 100)
+        --[[
+           [local len = dist(x1, y1, x2, y2)
+           [local dirx, diry = (x2 - x1) / len, (y2 - y1) / len
+           [local width = 10
+           [local p1x, p1y = x1 + dirx * width, y1 + -diry * width
+           [local p2x, p2y = x1 + dirx * width, y1 + -diry * width
+           [local p3x, p3y = x2 + -dirx * width, y2 + diry * width
+           [local p4x, p4y = x2 + -dirx * width, y2 + diry * width
+           ]]
 
-            gr.setPointSize(3)
+        addVertex2(array, p1.x, p1.y)
+        addVertex2(array, p2.x, p2.y)
+        addVertex2(array, p3.x, p3.y)
 
-            gr.points(p1x, p1y, p2x, p2y)
-            gr.points(p3x, p3y, p4x, p4y)
-
-            gr.setColor{0.1, 0.7, 0.2, 0.4}
-            gr.print("p1", p1x, p1y)
-            gr.print("p2", p2x, p2y)
-            gr.print("p3", p3x, p3y)
-            gr.print("p4", p4x, p4y)
-        end)
-
-        addVertex2(array, p1x, p1y)
-        addVertex2(array, p4x, p4y)
-        addVertex2(array, p3x, p3y)
-
-        addVertex2(array, p4x, p4y)
-        addVertex2(array, p2x, p2y)
-        addVertex2(array, p1x, p1y)
+        addVertex2(array, p4.x, p4.y)
+        addVertex2(array, p1.x, p1.y)
+        addVertex2(array, p2.x, p2.y)
     end
 
     function addBorder(data, hex)
---[[
-   [        addLine(data, hex[1], hex[2], hex[3], hex[4])
-   [        addLine(data, hex[3], hex[4], hex[5], hex[6])
-   [        addLine(data, hex[5], hex[6], hex[7], hex[8])
-   [        addLine(data, hex[7], hex[8], hex[9], hex[10])
-   [
-   [        addLine(data, hex[9], hex[10], hex[11], hex[12])
-   [        --addLine(data, hex[9] + 100, hex[10], hex[11] + 107, hex[12])
-   [
-   [        addLine(data, hex[11], hex[12], hex[1], hex[2])
-   ]]
-
-        local delta = 3
-        --local smaller, bigger = newHexPolygon(cx, cy, rad + delta), newHexPolygon(cx, cy, rad + delta)
-        --addVertex2(array, smaller[1], smaller[2])
-        --addVertex2(array, bigger[3], bigger[4])
-        --addVertex2(array, smaller[3], smaller[4])
+        addLine(data, hex[1], hex[2], hex[3], hex[4])
+        addLine(data, hex[3], hex[4], hex[5], hex[6])
+        addLine(data, hex[5], hex[6], hex[7], hex[8])
+        addLine(data, hex[7], hex[8], hex[9], hex[10])
+        addLine(data, hex[9], hex[10], hex[11], hex[12])
+        addLine(data, hex[11], hex[12], hex[1], hex[2])
     end
 
     local result = {}

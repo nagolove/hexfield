@@ -46,6 +46,14 @@ function drawLine(x1, y1, x2, y2)
     gr.setColor{1, 0, 0}
     gr.points(x1, y1, x2, y2)
 
+    addVertex(vertices, p1.x, p1.y)
+    addVertex(vertices, p2.x, p2.y)
+    addVertex(vertices, p3.x, p3.y)
+
+    addVertex(vertices, p4.x, p4.y)
+    addVertex(vertices, p1.x, p1.y)
+    addVertex(vertices, p2.x, p2.y)
+
     mesh:setVertices(vertices)
     gr.setColor(prevColor)
     gr.draw(mesh)
