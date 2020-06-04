@@ -1,13 +1,15 @@
 require "snippets"
 require "hex"
+local cam = require "camera".new()
 local inspect = require "inspect"
+local tween = require "tween"
 local gr = love.graphics
 
-local hexRad = 50
+local hexRad = 350
 local hexColor = {0.5, 0.6, 1, 1}
 local activeHexColor, passiveHexColor = {0.85, 0, 0, 1}, {0.5, 0.6, 0, 1}
-local hexField, hexMesh = newHexField(80, 80, 200, 200, hexRad, passiveHexColor)
---local hexField, hexMesh = newHexField(80, 80, 1, 1, hexRad, passiveHexColor)
+--local hexField, hexMesh = newHexField(80, 80, 300, 300, hexRad, passiveHexColor)
+local hexField, hexMesh = newHexField(380, 380, 1, 1, hexRad, passiveHexColor)
 
 local hex = newHexPolygon(100, 100, 50)
 local hexHeight = getHexPolygonHeight(hex)
@@ -80,7 +82,7 @@ function updateSelectedItem(x, y)
 end
 
 love.mousemoved = function(x, y, dx, dy)
-    updateSelectedItem(x, y)
+    --updateSelectedItem(x, y)
 end
 
 love.update = function(dt)

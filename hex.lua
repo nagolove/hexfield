@@ -95,8 +95,8 @@ function newHexField(startcx, startcy, xcount, ycount, rad, color)
 
     function addVertex2(array, x, y)
         table.insert(array, {
-            --x + 500, y + 500,
-            math.floor(x), math.floor(y),
+            x, y,
+            --math.floor(x), math.floor(y),
             0, 0, -- u v
             1, 1, 1, 1,
         })
@@ -129,7 +129,7 @@ function newHexField(startcx, startcy, xcount, ycount, rad, color)
         addVertex2(array, p3.x, p3.y)
 
         addVertex2(array, p4.x, p4.y)
-        addVertex2(array, p1.x, p1.y)
+        addVertex2(array, p3.x, p3.y)
         addVertex2(array, p2.x, p2.y)
     end
 
