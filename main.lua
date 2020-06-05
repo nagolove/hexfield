@@ -21,23 +21,21 @@ function drawRefs(hex)
             gr.circle("fill", x - diff, y, rad)
         end
         if hex.refs[2] then
+            gr.circle("fill", x - diff, y - diff, rad)
+        end
+        if hex.refs[3] then
+            gr.circle("fill", x + diff, y - diff, rad)
+        end
+        if hex.refs[4] then
             gr.circle("fill", x + diff, y, rad)
         end
-    --[[
-       [    if hex.refs[rad] then
-       [        gr.circle("fill", x - diff, y, rad)
-       [    end
-       [    if hex.refs[4] then
-       [        gr.circle("fill", x - diff, y, rad)
-       [    end
-       [    if hex.refs[5] then
-       [        gr.circle("fill", x - diff, y, rad)
-       [    end
-       [    if hex.refs[6] then
-       [        gr.circle("fill", x - diff, y, rad)
-       [    end
-       [end
-       ]]
+        if hex.refs[5] then
+            gr.circle("fill", x + diff, y + diff, rad)
+        end
+        if hex.refs[6] then
+            gr.circle("fill", x - diff, y + diff, rad)
+        end
+    end
 end
 
 love.draw = function()
