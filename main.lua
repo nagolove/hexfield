@@ -11,9 +11,34 @@ local activeHexColor, passiveHexColor = {0.85, 0, 0, 1}, {0.5, 0.6, 0, 1}
 local hexField, hexMesh = newHexField(80, 80, 30, 30, hexRad, passiveHexColor)
 --local hexField, hexMesh = newHexField(380, 380, 1, 1, hexRad, passiveHexColor)
 
-local hex = newHexPolygon(100, 100, 50)
-local hexHeight = getHexPolygonHeight(hex)
-local hexWidth = getHexPolygonWidth(hex)
+function drawRefs(hex)
+    gr.setColor{1, 0, 0}
+    if hex.refs then
+        local x, y = hex.cx, hex.cy
+        local rad = 8
+        local diff = hexRad / 2
+        if hex.refs[1] then
+            gr.circle("fill", x - diff, y, rad)
+        end
+        if hex.refs[2] then
+            gr.circle("fill", x + diff, y, rad)
+        end
+    --[[
+       [    if hex.refs[rad] then
+       [        gr.circle("fill", x - diff, y, rad)
+       [    end
+       [    if hex.refs[4] then
+       [        gr.circle("fill", x - diff, y, rad)
+       [    end
+       [    if hex.refs[5] then
+       [        gr.circle("fill", x - diff, y, rad)
+       [    end
+       [    if hex.refs[6] then
+       [        gr.circle("fill", x - diff, y, rad)
+       [    end
+       [end
+       ]]
+end
 
 love.draw = function()
     gr.setColor{1, 1, 1, 1}
@@ -24,6 +49,9 @@ love.draw = function()
 
     cam:attach()
     gr.draw(hexMesh)
+    for _, v in pairs(hexField) do
+        drawRefs(v)
+    end
     cam:detach()
 
     gr.setColor{0, 0.85, 0.1, 0.5}
